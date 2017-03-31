@@ -1,0 +1,9 @@
+*.pyc
+.coverage
+MANIFEST
+_build
+build
+cover
+dist
+streamcat.egg-info
+venv
