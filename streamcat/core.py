@@ -1,27 +1,46 @@
+import io
+
 DEFAULT_CHUNK_SIZE = 1024 * 1024
 
 
-class Stream:
+class Stream(io.RawIOBase):
     def __init__(self, iterator):
         self.iterator = iterator
         self.data = b''
 
+    def readable(self):
+        return True
+
+    def seekable(self):
+        return False
+
+    def writable(self):
+        return False
+
     def read(self, size=-1):
+        if size == -1:
+            return self.readall()
         chunks = []
         data_length = len(self.data)
-        try:
-            while data_length < size or size == -1:
+        if data_length < size:
+            try:
                 chunk = next(self.iterator)
                 chunks.append(chunk)
                 data_length += len(chunk)
-        except StopIteration:
-            pass
+            except StopIteration:
+                pass
         self.data += b''.join(chunks)
-        if size == -1:
-            (result, self.data) = (self.data, b'')
-        else:
-            (result, self.data) = (self.data[:size], self.data[size:])
+        (result, self.data) = (self.data[:size], self.data[size:])
         return result
+
+    def readinto(self, b):
+        data = self.read(len(b))
+        data_length = len(data)
+        b[0:data_length] = data
+        return data_length
+
+    def readall(self):
+        return b''.join(self.iterator)
 
 
 def iterator_to_stream(iterator):
