@@ -12,3 +12,5 @@ script:
   - isort --check-only --recursive
   - flake8
   - pytest --cov
+  - python setup.py check
+  - check-manifest
