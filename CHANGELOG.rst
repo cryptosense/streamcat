@@ -6,6 +6,7 @@ Change Log
 -------------
 
 * Declare support for Python 3.6 and PyPy.
+* Include more files in source distribution.
 
 `0.1.1`_ (2017-04-10)
 -------------------

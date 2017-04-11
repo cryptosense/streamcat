@@ -1,3 +1,4 @@
+check-manifest
 flake8
 isort
 pytest
