@@ -5,6 +5,8 @@ Change Log
 `Unreleased`_
 -------------
 
+* Declare support for Python 3.6 and PyPy.
+
 `0.1.1`_ (2017-04-10)
 -------------------
 
