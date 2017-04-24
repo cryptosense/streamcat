@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 setup(
     name='streamcat',
     packages=find_packages(exclude=('tests', 'docs')),
-    version='0.1.1',
+    version='0.2.0',
     description='Encode and decode concatenated objects as streams',
     long_description=open('README.rst', 'r').read(),
     author='Bertrand Bonnefoy-Claudet',
