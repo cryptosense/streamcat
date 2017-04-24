@@ -5,6 +5,11 @@ Change Log
 `Unreleased`_
 -------------
 
+`0.2.1`_ (2017-04-24)
+---------------------
+
+* Fix download URL.
+
 `0.2.0`_ (2017-04-24)
 ---------------------
 
@@ -18,4 +23,5 @@ Change Log
 
 .. _0.1.1: https://github.com/cryptosense/streamcat/tree/v0.1.1
 .. _0.2.0: https://github.com/cryptosense/streamcat/compare/v0.1.1...v0.2.0
-.. _Unreleased: https://github.com/cryptosense/streamcat/compare/v0.2.0...master
+.. _0.2.1: https://github.com/cryptosense/streamcat/compare/v0.2.0...v0.2.1
+.. _Unreleased: https://github.com/cryptosense/streamcat/compare/v0.2.1...master

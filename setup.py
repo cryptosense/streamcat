@@ -1,15 +1,17 @@
 from setuptools import find_packages, setup
 
+version = '0.2.1'
+
 setup(
     name='streamcat',
     packages=find_packages(exclude=('tests', 'docs')),
-    version='0.2.0',
+    version=version,
     description='Encode and decode concatenated objects as streams',
     long_description=open('README.rst', 'r').read(),
     author='Bertrand Bonnefoy-Claudet',
     author_email='bertrand@cryptosense.com',
     url='https://github.com/cryptosense/streamcat',
-    download_url='https://github.com/cryptosense/streamcat/tarball/v0.1.1',
+    download_url='https://github.com/cryptosense/streamcat/tarball/v{}'.format(version),
     keywords=['stream', 'file', 'json'],
     license='MIT',
     classifiers=[
