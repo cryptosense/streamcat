@@ -13,7 +13,7 @@ setup(
     url='https://github.com/cryptosense/streamcat',
     download_url='https://github.com/cryptosense/streamcat/tarball/v{}'.format(version),
     keywords=['stream', 'file', 'json'],
-    license='MIT',
+    license='BSD',
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',

@@ -5,6 +5,8 @@ Change Log
 `Unreleased`_
 -------------
 
+* Fix license declaration in metadata.
+
 `0.2.1`_ (2017-04-24)
 ---------------------
 
