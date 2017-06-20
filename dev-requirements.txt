@@ -1,3 +1,4 @@
+-r requirements.txt
 check-manifest
 flake8
 isort
