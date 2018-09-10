@@ -1,4 +1,4 @@
--r requirements.txt
+--editable .
 check-manifest
 flake8
 isort
