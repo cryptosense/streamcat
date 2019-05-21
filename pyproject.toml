@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "streamcat"
+version = "0.2.1"
+description = "Encode and decode concatenated objects as streams"
+readme = "README.rst"
+authors = ["Cryptosense <opensource@cryptosense.com>"]
+keywords = ["stream", "file", "json"]
+license = "MIT"
+homepage = "https://github.com/cryptosense/streamcat"
+include = [
+    ".isort.cfg",
+    ".coveragerc",
+    "CHANGELOG.rst",
+    "tests",
+]
+
+[tool.poetry.dependencies]
+python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[tool.poetry.dev-dependencies]
+flake8 = "*"
+isort = "*"
+pytest = "*"
+pytest-cov = "*"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
