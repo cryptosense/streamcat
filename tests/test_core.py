@@ -9,55 +9,88 @@ import streamcat
 class TestStream:
     def test_attributes(self):
         stream = streamcat.core.Stream(iter(()))
+
         assert stream.readable()
         assert not stream.seekable()
         assert not stream.writable()
 
+
+class TestStreamRead:
     def test_empty(self):
-        stream = streamcat.core.Stream(iter(()))
-        assert stream.read() == b''
-        assert stream.read(1) == b''
+        stream = streamcat.core.Stream(iter([]))
 
-    def test_read_size(self):
-        stream = streamcat.core.Stream(str(i).encode() for i in range(4))
-        assert stream.read(0) == b''
-        assert stream.read(1) == b'0'
-        assert stream.read(2) == b'1'
-        assert stream.read(3) == b'2'
-        assert stream.read(4) == b'3'
-        assert stream.read(5) == b''
+        result = stream.read()
 
-    def test_read(self):
-        stream = streamcat.core.Stream(iter(()))
-        assert stream.read() == b''
+        assert result == b""
 
-    def test_readall(self):
-        stream = streamcat.core.Stream(str(i).encode() for i in range(4))
-        assert stream.readall() == b'0123'
-        assert stream.readall() == b''
+    def test_size_exact(self):
+        iterator = iter([b"0", b"1"])
+        stream = streamcat.core.Stream(iterator)
+
+        result = stream.read(1)
+
+        assert result == b"0"
+        assert list(iterator) == [b"1"]
+
+    def test_size_more(self):
+        iterator = iter([b"0", b"1"])
+        stream = streamcat.core.Stream(iterator)
+
+        result = stream.read(2)
+
+        assert result == b"0"
+        assert list(iterator) == [b"1"]
+
+    def test_size_more_with_buffered_reader(self):
+        iterator = iter([b"0", b"1"])
+        stream = io.BufferedReader(streamcat.core.Stream(iterator))
+
+        result = stream.read(2)
+
+        assert result == b"01"
+        assert list(iterator) == []
+
+    def test_size_partial_enough(self):
+        iterator = iter([b"01", b"2"])
+        stream = streamcat.core.Stream(iterator)
+
+        result_0 = stream.read(1)
+        result_1 = stream.read(1)
+
+        assert result_0 == b"0"
+        assert result_1 == b"1"
+        assert list(iterator) == [b"2"]
+
+    def test_size_partial(self):
+        iterator = iter([b"01", b"2"])
+        stream = streamcat.core.Stream(iterator)
+
+        result_0 = stream.read(1)
+        result_1 = stream.read(2)
+
+        assert result_0 == b"0"
+        assert result_1 == b"12"
+        assert list(iterator) == []
+
+    def test_size_default(self):
+        iterator = iter([b"0", b"1"])
+        stream = streamcat.core.Stream(iterator)
+
+        result = stream.read()
+
+        assert result == b"01"
+        assert list(iterator) == []
 
 
-class TestBufferedStream:
-    def test_empty(self):
-        raw = streamcat.core.Stream(iter(()))
-        stream = io.BufferedReader(raw)
-        assert stream.read() == b''
-        assert stream.read(1) == b''
+class TestStreamReadall:
+    def test(self):
+        iterator = iter([b"0", b"1"])
+        stream = streamcat.core.Stream(iterator)
 
-    def test_read_size(self):
-        raw = streamcat.core.Stream(str(i).encode() for i in range(4))
-        stream = io.BufferedReader(raw)
-        assert stream.read(0) == b''
-        assert stream.read(1) == b'0'
-        assert stream.read(2) == b'12'
-        assert stream.read(3) == b'3'
-        assert stream.read(4) == b''
+        result = stream.readall()
 
-    def test_read(self):
-        raw = streamcat.core.Stream(str(i).encode() for i in range(4))
-        stream = io.BufferedReader(raw)
-        assert stream.read() == b'0123'
-        assert stream.read() == b''
+        assert result == b"01"
+        assert list(iterator) == []
 
 
 class TestIteratorToStream:
@@ -66,22 +99,34 @@ class TestIteratorToStream:
 
 
 class TestStreamToIterator:
-    def check_decode(self, input, expected, chunk_size):
+    @pytest.mark.parametrize("chunk_size", (1, 2, 1024))
+    @pytest.mark.parametrize(
+        "test_input,expected",
+        [
+            ("", []),
+            ("{}", [{}]),
+            ("{}[]", [{}, []]),
+            ("{}\n[]", [{}, []]),
+            ("\n{}\n\n[]\n\n", [{}, []]),
+        ],
+    )
+    def test_ok(self, chunk_size, test_input, expected):
         decoder = json.JSONDecoder()
-        gen = streamcat.stream_to_iterator(io.BytesIO(input.encode()), decoder, chunk_size)
-        assert list(gen) == expected
 
-    @pytest.mark.parametrize('chunk_size', (1, 2, 1024))
-    def test_ok(self, chunk_size):
-        self.check_decode('', [], chunk_size)
-        self.check_decode('{}', [{}], chunk_size)
-        self.check_decode('{}[]', [{}, []], chunk_size)
-        self.check_decode('{}\n[]', [{}, []], chunk_size)
-        self.check_decode('\n{}\n\n[]\n\n', [{}, []], chunk_size)
+        result = streamcat.stream_to_iterator(
+            io.BytesIO(test_input.encode()), decoder, chunk_size
+        )
 
-    @pytest.mark.parametrize('chunk_size', (1, 2, 1024))
-    def test_error(self, chunk_size):
+        assert list(result) == expected
+
+    @pytest.mark.parametrize("chunk_size", (1, 2, 1024))
+    @pytest.mark.parametrize("test_input", ("{", "}"))
+    def test_error(self, chunk_size, test_input):
+        decoder = json.JSONDecoder()
+
+        result = streamcat.stream_to_iterator(
+            io.BytesIO(test_input.encode()), decoder, chunk_size
+        )
+
         with pytest.raises(ValueError):
-            self.check_decode('{', [], chunk_size)
-        with pytest.raises(ValueError):
-            self.check_decode('}', [], chunk_size)
+            list(result)
